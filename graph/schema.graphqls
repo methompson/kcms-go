@@ -1,0 +1,82 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Page {
+  id: ID!
+  slug: String!
+  enabled: Boolean!
+  content: String!
+  meta: String!
+  dateAdded: Int!
+  dateUpdated: Int!
+}
+
+input PageInput {
+  slug: String!
+  enabled: Boolean
+  content: String!
+  meta: String
+}
+
+type User {
+  id: ID!
+  firstName: String
+  lastName: String
+  username: String!
+  email: String!
+  userType: String!
+  userMeta: String!
+  dateAdded: Int!
+  dateUpdaetd: Int!
+  enabled: Boolean!
+}
+
+input UserInput {
+  firstName: String
+  lastName: String
+  username: String!
+  email: String!
+  userType: String
+  userMeta: String
+  enabled: Boolean
+  password: String!
+}
+
+type BlogPost {
+  id: ID!
+  name: String!
+  slug: String!
+  draft: Boolean!
+  public: Boolean!
+  content: String!
+  meta: String!
+  dateAdded: Int!
+  dateUpdated: Int!
+}
+
+input BlogPostInput {
+  name: String!
+  slug: String!
+  draft: Boolean
+  public: Boolean
+  content: String!
+  meta: String
+}
+
+type Query {
+  pages: [Page!]!
+  users: [User!]!
+  blogPosts: [BlogPost!]!
+}
+
+type Mutation {
+  addUser(input: UserInput): User!
+  editUser(id: ID!, input: UserInput): User!
+
+  addPage(input: PageInput): Page!
+  editPage(id: ID!, input: PageInput): Page!
+
+  addBlogPost(input: BlogPostInput): BlogPost!
+  editBlogPost(id: ID!, input: BlogPostInput): BlogPost!
+}

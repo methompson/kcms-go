@@ -1,0 +1,9 @@
+{
+  "mysqldb": {
+    "host": "localhost",
+    "port": 3306,
+    "databaseName": "kcms",
+    "username": "cms_user",
+    "password": "cms_pw"
+  }
+}
