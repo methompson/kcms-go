@@ -1,14 +1,13 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 
-	"com.methompson/go-test/config"
 	"com.methompson/go-test/graph"
 	"com.methompson/go-test/graph/generated"
+	"com.methompson/go-test/kcms"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 
@@ -24,16 +23,17 @@ func main() {
 		port = defaultPort
 	}
 
-	configDat, err := ioutil.ReadFile("./config.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	config.ReadConfig(configDat)
+	cms := kcms.MakeKCMS()
 
 	srv := handler.
 		NewDefaultServer(
-			generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}),
+			generated.NewExecutableSchema(
+				generated.Config{
+					Resolvers: &graph.Resolver{
+						KCMS: cms,
+					},
+				},
+			),
 		)
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))

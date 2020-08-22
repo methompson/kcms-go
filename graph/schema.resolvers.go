@@ -128,6 +128,8 @@ func (r *queryResolver) Pages(ctx context.Context) ([]*model.Page, error) {
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var emptyStr string = ""
 
+	r.KCMS.UserController.GetUserByID("1")
+
 	user := &model.User{
 		ID:          "",
 		FirstName:   &emptyStr,
