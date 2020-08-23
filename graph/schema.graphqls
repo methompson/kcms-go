@@ -12,6 +12,12 @@ type Page {
   dateUpdated: Int!
 }
 
+input PageFilter {
+  id: ID
+  ids: [ID]
+  slug: String
+}
+
 input PageInput {
   slug: String!
   enabled: Boolean
@@ -30,6 +36,12 @@ type User {
   dateAdded: Int!
   dateUpdaetd: Int!
   enabled: Boolean!
+}
+
+input UserFilter {
+  id: ID
+  email: String
+  userType: String
 }
 
 input UserInput {
@@ -55,6 +67,11 @@ type BlogPost {
   dateUpdated: Int!
 }
 
+input BlogFilter {
+  id: ID
+  slug: String
+}
+
 input BlogPostInput {
   name: String!
   slug: String!
@@ -64,19 +81,36 @@ input BlogPostInput {
   meta: String
 }
 
+input SignupUser {
+  firstName: String
+  lastName: String
+  email: String!
+  username: String!
+  password: String!
+  userType: String
+  enabled: Boolean
+  userMeta: String
+}
+
 type Query {
-  pages: [Page!]!
-  users: [User!]!
-  blogPosts: [BlogPost!]!
+  pages(pageFilter: PageFilter): [Page!]!
+  users(userFilter: UserFilter): [User!]!
+  blogPosts(blogFilter: BlogFilter): [BlogPost!]!
 }
 
 type Mutation {
   addUser(input: UserInput): User!
   editUser(id: ID!, input: UserInput): User!
+  deleteUser(id: ID!): ID!
 
   addPage(input: PageInput): Page!
   editPage(id: ID!, input: PageInput): Page!
+  deletePage(id: ID!): ID!
 
   addBlogPost(input: BlogPostInput): BlogPost!
   editBlogPost(id: ID!, input: BlogPostInput): BlogPost!
+  deleteBlogPost(id: ID!): ID!
+
+  login(email: String!, password: String!): String!
+  signup(user: SignupUser!): String!
 }

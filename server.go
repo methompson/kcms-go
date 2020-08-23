@@ -8,8 +8,11 @@ import (
 	"com.methompson/go-test/graph"
 	"com.methompson/go-test/graph/generated"
 	"com.methompson/go-test/kcms"
+	"com.methompson/go-test/kcms/headers"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -36,9 +39,18 @@ func main() {
 			),
 		)
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	router := chi.NewRouter()
+
+	router.Use(headers.JWTExtractor())
+
+	// fmt.Printf("Handler %T\n", srv)
+
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", srv)
+	// http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	// http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, router))
+	// log.Fatal(http.ListenAndServe(":"+port, nil))
 }

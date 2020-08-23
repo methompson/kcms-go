@@ -5,9 +5,11 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"com.methompson/go-test/graph/generated"
 	"com.methompson/go-test/graph/model"
+	"com.methompson/go-test/kcms/headers"
 )
 
 func (r *mutationResolver) AddUser(ctx context.Context, input *model.UserInput) (*model.User, error) {
@@ -48,6 +50,10 @@ func (r *mutationResolver) EditUser(ctx context.Context, id string, input *model
 	return user, nil
 }
 
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (string, error) {
+	return "69", nil
+}
+
 func (r *mutationResolver) AddPage(ctx context.Context, input *model.PageInput) (*model.Page, error) {
 	page := &model.Page{
 		ID:          "1",
@@ -74,6 +80,10 @@ func (r *mutationResolver) EditPage(ctx context.Context, id string, input *model
 	}
 
 	return page, nil
+}
+
+func (r *mutationResolver) DeletePage(ctx context.Context, id string) (string, error) {
+	return "69", nil
 }
 
 func (r *mutationResolver) AddBlogPost(ctx context.Context, input *model.BlogPostInput) (*model.BlogPost, error) {
@@ -108,7 +118,22 @@ func (r *mutationResolver) EditBlogPost(ctx context.Context, id string, input *m
 	return post, nil
 }
 
-func (r *queryResolver) Pages(ctx context.Context) ([]*model.Page, error) {
+func (r *mutationResolver) DeleteBlogPost(ctx context.Context, id string) (string, error) {
+	return "69", nil
+}
+
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (string, error) {
+	return "123", nil
+}
+
+func (r *mutationResolver) Signup(ctx context.Context, user model.SignupUser) (string, error) {
+	headers.GetHeaderAuth(ctx)
+	return "321", nil
+}
+
+func (r *queryResolver) Pages(ctx context.Context, pageFilter *model.PageFilter) ([]*model.Page, error) {
+	// We have to de-reference the pointer-to-value
+	fmt.Println(*pageFilter.ID)
 	page := &model.Page{
 		ID:          "1",
 		Slug:        "my-slug",
@@ -122,10 +147,10 @@ func (r *queryResolver) Pages(ctx context.Context) ([]*model.Page, error) {
 	var pages []*model.Page
 	pages = append(pages, page)
 	return pages, nil
-	// panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+func (r *queryResolver) Users(ctx context.Context, userFilter *model.UserFilter) ([]*model.User, error) {
+	fmt.Println(userFilter)
 	var emptyStr string = ""
 
 	r.KCMS.UserController.GetUserByID("1")
@@ -148,8 +173,8 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	return users, nil
 }
 
-func (r *queryResolver) BlogPosts(ctx context.Context) ([]*model.BlogPost, error) {
-	// var emptyStr string = ""
+func (r *queryResolver) BlogPosts(ctx context.Context, blogFilter *model.BlogFilter) ([]*model.BlogPost, error) {
+	fmt.Println(blogFilter)
 
 	post := &model.BlogPost{
 		ID:          "",
