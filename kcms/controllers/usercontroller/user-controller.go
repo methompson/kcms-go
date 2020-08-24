@@ -1,5 +1,7 @@
 package usercontroller
 
+import "com.methompson/go-test/kcms/jwtuserdata"
+
 // UserController interface handles all User related tasks
 type UserController interface {
 	CheckPassword()
@@ -25,10 +27,16 @@ func (inst BaseUserController) CheckPassword() {}
 func (inst BaseUserController) GetUserTypes() {}
 
 // GetUserRequestToken extracts the user request token from storage and decodes it
+// TODO determine if this is needed anymore
 func (inst BaseUserController) GetUserRequestToken() {}
 
 // AuthenticateUserCredentials authenticates the user's request token
 func (inst BaseUserController) AuthenticateUserCredentials() {}
+
+// EncodeCredentials will take user credentials and encode them into a JWT
+func (inst BaseUserController) EncodeCredentials(jwtuserdata.JWTUserData) string {
+	return "123"
+}
 
 // GetUserByID gets a User object from storage using an id
 func (inst BaseUserController) GetUserByID(id string) {}

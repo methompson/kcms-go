@@ -31,7 +31,7 @@ type dbConfig struct {
 // Configuration stores all of the configuration data in an easy to use struct
 type Configuration struct {
 	DB          dbConfig `json:"db"`
-	JwtSecret   string   `json:"jwtSecret"`
+	JWTSecret   string   `json:"jwtSecret"`
 	BlogEnabled bool     `json:"blogEnabled"`
 }
 
@@ -48,7 +48,7 @@ func ReadConfig() Configuration {
 	// the JSON data into the struct. If the JSON structure is correct, we will have a properly
 	// filled struct.
 	config := Configuration{
-		JwtSecret:   "secret",
+		JWTSecret:   "secret",
 		BlogEnabled: true,
 	}
 	err = json.Unmarshal([]byte(configDat), &config)

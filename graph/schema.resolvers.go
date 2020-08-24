@@ -127,7 +127,14 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 }
 
 func (r *mutationResolver) Signup(ctx context.Context, user model.SignupUser) (string, error) {
-	headers.GetHeaderAuth(ctx)
+	// headers.GetHeaderAuth(ctx)
+
+	// This is a reference
+	authToken := headers.GetHeaderAuth(ctx)
+	fmt.Println(authToken)
+	// fmt.Println(authToken["iat"])
+	// claimsType := fmt.Sprintf("%T", authToken)
+	// fmt.Println("resolver", claimsType, authToken)
 	return "321", nil
 }
 

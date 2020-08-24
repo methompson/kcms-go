@@ -17,6 +17,8 @@ type KCMS struct {
 	BlogPostController blogpostcontroller.BlogPostController
 	PageController     pagecontroller.PageController
 	UserController     usercontroller.UserController
+
+	JWTSecret string
 }
 
 // MakeKCMS will create a KCMS struct and return based upon configuration or panic
@@ -31,6 +33,7 @@ func MakeKCMS() KCMS {
 	if (config.DB.Mysqldb != configuration.MySQLConfig{}) {
 		dbController := mysqlcontroller.GetMysqlDb(config.DB.Mysqldb)
 		cms = makeMySQLKcms(dbController)
+		cms.JWTSecret = config.JWTSecret
 
 		// Check if the MongoDB configuration is empty
 	} else if (config.DB.Mongodb != configuration.MongoDBConfig{}) {

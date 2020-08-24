@@ -41,7 +41,7 @@ func main() {
 
 	router := chi.NewRouter()
 
-	router.Use(headers.JWTExtractor())
+	router.Use(headers.JWTExtractor(cms))
 
 	// fmt.Printf("Handler %T\n", srv)
 
