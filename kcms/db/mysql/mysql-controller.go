@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"com.methompson/go-test/kcms/configuration"
+	"com.methompson/kcms-go/kcms/configuration"
 )
 
 // MySQLCMS is a structure that binds all of the different data controllers to a database

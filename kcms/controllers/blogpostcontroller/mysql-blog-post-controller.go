@@ -3,7 +3,7 @@ package blogpostcontroller
 import (
 	"fmt"
 
-	mysqlcontroller "com.methompson/go-test/kcms/db/mysql"
+	mysqlcontroller "com.methompson/kcms-go/kcms/db/mysql"
 )
 
 // MySQLBlogPostController is an implementation of BlogPostController with MySQL

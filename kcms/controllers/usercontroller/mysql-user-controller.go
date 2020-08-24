@@ -3,7 +3,7 @@ package usercontroller
 import (
 	"fmt"
 
-	mysqlcontroller "com.methompson/go-test/kcms/db/mysql"
+	mysqlcontroller "com.methompson/kcms-go/kcms/db/mysql"
 )
 
 // MySQLUserController is an implementation of UserController with MySQL implementations

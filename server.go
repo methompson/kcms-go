@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"os"
 
-	"com.methompson/go-test/graph"
-	"com.methompson/go-test/graph/generated"
-	"com.methompson/go-test/kcms"
-	"com.methompson/go-test/kcms/headers"
+	"com.methompson/kcms-go/graph"
+	"com.methompson/kcms-go/graph/generated"
+	"com.methompson/kcms-go/kcms"
+	"com.methompson/kcms-go/kcms/headers"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"

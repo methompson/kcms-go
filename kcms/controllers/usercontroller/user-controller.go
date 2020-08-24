@@ -1,6 +1,6 @@
 package usercontroller
 
-import "com.methompson/go-test/kcms/jwtuserdata"
+import "com.methompson/kcms-go/kcms/jwtuserdata"
 
 // UserController interface handles all User related tasks
 type UserController interface {

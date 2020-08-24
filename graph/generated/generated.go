@@ -10,7 +10,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"com.methompson/go-test/graph/model"
+	"com.methompson/kcms-go/graph/model"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"

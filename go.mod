@@ -1,4 +1,4 @@
-module com.methompson/go-test
+module com.methompson/kcms-go
 
 go 1.15
 

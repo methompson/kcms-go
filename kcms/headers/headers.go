@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"com.methompson/go-test/kcms"
-	"com.methompson/go-test/kcms/jwtuserdata"
+	"com.methompson/kcms-go/kcms"
+	"com.methompson/kcms-go/kcms/jwtuserdata"
 	"github.com/dgrijalva/jwt-go"
 )
 

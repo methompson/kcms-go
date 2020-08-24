@@ -3,7 +3,7 @@ package pagecontroller
 import (
 	"fmt"
 
-	mysqlcontroller "com.methompson/go-test/kcms/db/mysql"
+	mysqlcontroller "com.methompson/kcms-go/kcms/db/mysql"
 )
 
 // MySQLPageController is an implementation of PageController with MySQL

@@ -7,9 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	"com.methompson/go-test/graph/generated"
-	"com.methompson/go-test/graph/model"
-	"com.methompson/go-test/kcms/headers"
+	"com.methompson/kcms-go/graph/generated"
+	"com.methompson/kcms-go/graph/model"
+	"com.methompson/kcms-go/kcms/headers"
 )
 
 func (r *mutationResolver) AddUser(ctx context.Context, input *model.UserInput) (*model.User, error) {

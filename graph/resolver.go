@@ -1,7 +1,7 @@
 package graph
 
 import (
-	"com.methompson/go-test/kcms"
+	"com.methompson/kcms-go/kcms"
 )
 
 // This file will not be regenerated automatically.

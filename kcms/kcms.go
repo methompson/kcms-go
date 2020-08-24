@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 
-	"com.methompson/go-test/kcms/configuration"
-	"com.methompson/go-test/kcms/controllers/blogpostcontroller"
-	"com.methompson/go-test/kcms/controllers/pagecontroller"
-	"com.methompson/go-test/kcms/controllers/usercontroller"
-	mysqlcontroller "com.methompson/go-test/kcms/db/mysql"
+	"com.methompson/kcms-go/kcms/configuration"
+	"com.methompson/kcms-go/kcms/controllers/blogpostcontroller"
+	"com.methompson/kcms-go/kcms/controllers/pagecontroller"
+	"com.methompson/kcms-go/kcms/controllers/usercontroller"
+	mysqlcontroller "com.methompson/kcms-go/kcms/db/mysql"
 )
 
 // KCMS represents the cms object for the entire program to use. The blog, page and user controllers
