@@ -111,6 +111,6 @@ type Mutation {
   editBlogPost(id: ID!, input: BlogPostInput): BlogPost!
   deleteBlogPost(id: ID!): ID!
 
-  login(email: String!, password: String!): String!
+  login(email: String, username: String, password: String!): String!
   signup(user: SignupUser!): String!
 }

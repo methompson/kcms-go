@@ -51,13 +51,13 @@ func MakeKCMS() KCMS {
 func makeMySQLKcms(dbInstance mysqlcontroller.MySQLCMS) KCMS {
 	cms := KCMS{
 		BlogPostController: blogpostcontroller.MySQLBlogPostController{
-			DbInstance: dbInstance,
+			Controller: dbInstance,
 		},
 		UserController: usercontroller.MySQLUserController{
-			DbInstance: dbInstance,
+			Controller: dbInstance,
 		},
 		PageController: pagecontroller.MySQLPageController{
-			DbInstance: dbInstance,
+			Controller: dbInstance,
 		},
 	}
 

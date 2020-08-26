@@ -7,6 +7,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/99designs/gqlgen/graphql"
+
 	"com.methompson/kcms-go/graph/generated"
 	"com.methompson/kcms-go/graph/model"
 	"com.methompson/kcms-go/kcms/headers"
@@ -122,8 +124,14 @@ func (r *mutationResolver) DeleteBlogPost(ctx context.Context, id string) (strin
 	return "69", nil
 }
 
-func (r *mutationResolver) Login(ctx context.Context, email string, password string) (string, error) {
-	return "123", nil
+func (r *mutationResolver) Login(ctx context.Context, email *string, username *string, password string) (string, error) {
+	token, err := r.KCMS.UserController.LogUserIn(email, username, password)
+
+	if err != "" {
+		graphql.AddErrorf(ctx, err)
+	}
+
+	return token, nil
 }
 
 func (r *mutationResolver) Signup(ctx context.Context, user model.SignupUser) (string, error) {

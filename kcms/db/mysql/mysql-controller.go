@@ -11,7 +11,7 @@ import (
 
 // MySQLCMS is a structure that binds all of the different data controllers to a database
 type MySQLCMS struct {
-	instance *sql.DB
+	Instance *sql.DB
 }
 
 func (inst *MySQLCMS) connect(dbInfo map[string]string) {}
@@ -63,7 +63,7 @@ func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
 	db.SetMaxIdleConns(10)
 
 	cms := MySQLCMS{
-		instance: db,
+		Instance: db,
 	}
 
 	results, queryErr := db.Query("SELECT id, name FROM pages")

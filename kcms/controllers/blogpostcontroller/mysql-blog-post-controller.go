@@ -10,7 +10,7 @@ import (
 // implementations for retrieving data
 type MySQLBlogPostController struct {
 	BaseBlogPostController
-	DbInstance mysqlcontroller.MySQLCMS
+	Controller mysqlcontroller.MySQLCMS
 }
 
 // GetBlogPostByID gets a BlogPost object from storage using an id

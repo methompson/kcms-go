@@ -65,7 +65,7 @@ type ComplexityRoot struct {
 		EditBlogPost   func(childComplexity int, id string, input *model.BlogPostInput) int
 		EditPage       func(childComplexity int, id string, input *model.PageInput) int
 		EditUser       func(childComplexity int, id string, input *model.UserInput) int
-		Login          func(childComplexity int, email string, password string) int
+		Login          func(childComplexity int, email *string, username *string, password string) int
 		Signup         func(childComplexity int, user model.SignupUser) int
 	}
 
@@ -109,7 +109,7 @@ type MutationResolver interface {
 	AddBlogPost(ctx context.Context, input *model.BlogPostInput) (*model.BlogPost, error)
 	EditBlogPost(ctx context.Context, id string, input *model.BlogPostInput) (*model.BlogPost, error)
 	DeleteBlogPost(ctx context.Context, id string) (string, error)
-	Login(ctx context.Context, email string, password string) (string, error)
+	Login(ctx context.Context, email *string, username *string, password string) (string, error)
 	Signup(ctx context.Context, user model.SignupUser) (string, error)
 }
 type QueryResolver interface {
@@ -314,7 +314,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Login(childComplexity, args["email"].(string), args["password"].(string)), true
+		return e.complexity.Mutation.Login(childComplexity, args["email"].(*string), args["username"].(*string), args["password"].(string)), true
 
 	case "Mutation.signup":
 		if e.complexity.Mutation.Signup == nil {
@@ -660,7 +660,7 @@ type Mutation {
   editBlogPost(id: ID!, input: BlogPostInput): BlogPost!
   deleteBlogPost(id: ID!): ID!
 
-  login(email: String!, password: String!): String!
+  login(email: String, username: String, password: String!): String!
   signup(user: SignupUser!): String!
 }`, BuiltIn: false},
 }
@@ -675,7 +675,7 @@ func (ec *executionContext) field_Mutation_addBlogPost_args(ctx context.Context,
 	args := map[string]interface{}{}
 	var arg0 *model.BlogPostInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPostInput(ctx, tmp)
+		arg0, err = ec.unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -689,7 +689,7 @@ func (ec *executionContext) field_Mutation_addPage_args(ctx context.Context, raw
 	args := map[string]interface{}{}
 	var arg0 *model.PageInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalOPageInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageInput(ctx, tmp)
+		arg0, err = ec.unmarshalOPageInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -703,7 +703,7 @@ func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, raw
 	args := map[string]interface{}{}
 	var arg0 *model.UserInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalOUserInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalOUserInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -767,7 +767,7 @@ func (ec *executionContext) field_Mutation_editBlogPost_args(ctx context.Context
 	args["id"] = arg0
 	var arg1 *model.BlogPostInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg1, err = ec.unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPostInput(ctx, tmp)
+		arg1, err = ec.unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -789,7 +789,7 @@ func (ec *executionContext) field_Mutation_editPage_args(ctx context.Context, ra
 	args["id"] = arg0
 	var arg1 *model.PageInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg1, err = ec.unmarshalOPageInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageInput(ctx, tmp)
+		arg1, err = ec.unmarshalOPageInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -811,7 +811,7 @@ func (ec *executionContext) field_Mutation_editUser_args(ctx context.Context, ra
 	args["id"] = arg0
 	var arg1 *model.UserInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg1, err = ec.unmarshalOUserInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserInput(ctx, tmp)
+		arg1, err = ec.unmarshalOUserInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -823,22 +823,30 @@ func (ec *executionContext) field_Mutation_editUser_args(ctx context.Context, ra
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 *string
 	if tmp, ok := rawArgs["email"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["email"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["password"]; ok {
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg1 *string
+	if tmp, ok := rawArgs["username"]; ok {
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["password"] = arg1
+	args["username"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["password"]; ok {
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["password"] = arg2
 	return args, nil
 }
 
@@ -847,7 +855,7 @@ func (ec *executionContext) field_Mutation_signup_args(ctx context.Context, rawA
 	args := map[string]interface{}{}
 	var arg0 model.SignupUser
 	if tmp, ok := rawArgs["user"]; ok {
-		arg0, err = ec.unmarshalNSignupUser2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐSignupUser(ctx, tmp)
+		arg0, err = ec.unmarshalNSignupUser2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐSignupUser(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -875,7 +883,7 @@ func (ec *executionContext) field_Query_blogPosts_args(ctx context.Context, rawA
 	args := map[string]interface{}{}
 	var arg0 *model.BlogFilter
 	if tmp, ok := rawArgs["blogFilter"]; ok {
-		arg0, err = ec.unmarshalOBlogFilter2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOBlogFilter2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -889,7 +897,7 @@ func (ec *executionContext) field_Query_pages_args(ctx context.Context, rawArgs 
 	args := map[string]interface{}{}
 	var arg0 *model.PageFilter
 	if tmp, ok := rawArgs["pageFilter"]; ok {
-		arg0, err = ec.unmarshalOPageFilter2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOPageFilter2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -903,7 +911,7 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 	args := map[string]interface{}{}
 	var arg0 *model.UserFilter
 	if tmp, ok := rawArgs["userFilter"]; ok {
-		arg0, err = ec.unmarshalOUserFilter2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOUserFilter2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1292,7 +1300,7 @@ func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_editUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1333,7 +1341,7 @@ func (ec *executionContext) _Mutation_editUser(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1415,7 +1423,7 @@ func (ec *executionContext) _Mutation_addPage(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.Page)
 	fc.Result = res
-	return ec.marshalNPage2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPage(ctx, field.Selections, res)
+	return ec.marshalNPage2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_editPage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1456,7 +1464,7 @@ func (ec *executionContext) _Mutation_editPage(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.Page)
 	fc.Result = res
-	return ec.marshalNPage2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPage(ctx, field.Selections, res)
+	return ec.marshalNPage2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deletePage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1538,7 +1546,7 @@ func (ec *executionContext) _Mutation_addBlogPost(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.BlogPost)
 	fc.Result = res
-	return ec.marshalNBlogPost2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPost(ctx, field.Selections, res)
+	return ec.marshalNBlogPost2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_editBlogPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1579,7 +1587,7 @@ func (ec *executionContext) _Mutation_editBlogPost(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.BlogPost)
 	fc.Result = res
-	return ec.marshalNBlogPost2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPost(ctx, field.Selections, res)
+	return ec.marshalNBlogPost2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteBlogPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1647,7 +1655,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, args["email"].(string), args["password"].(string))
+		return ec.resolvers.Mutation().Login(rctx, args["email"].(*string), args["username"].(*string), args["password"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1981,7 +1989,7 @@ func (ec *executionContext) _Query_pages(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.Page)
 	fc.Result = res
-	return ec.marshalNPage2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageᚄ(ctx, field.Selections, res)
+	return ec.marshalNPage2ᚕᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2022,7 +2030,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_blogPosts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2063,7 +2071,7 @@ func (ec *executionContext) _Query_blogPosts(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.BlogPost)
 	fc.Result = res
-	return ec.marshalNBlogPost2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPostᚄ(ctx, field.Selections, res)
+	return ec.marshalNBlogPost2ᚕᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4408,11 +4416,11 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNBlogPost2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPost(ctx context.Context, sel ast.SelectionSet, v model.BlogPost) graphql.Marshaler {
+func (ec *executionContext) marshalNBlogPost2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPost(ctx context.Context, sel ast.SelectionSet, v model.BlogPost) graphql.Marshaler {
 	return ec._BlogPost(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNBlogPost2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.BlogPost) graphql.Marshaler {
+func (ec *executionContext) marshalNBlogPost2ᚕᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.BlogPost) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4436,7 +4444,7 @@ func (ec *executionContext) marshalNBlogPost2ᚕᚖcomᚗmethompsonᚋgoᚑtest�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNBlogPost2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPost(ctx, sel, v[i])
+			ret[i] = ec.marshalNBlogPost2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPost(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4449,7 +4457,7 @@ func (ec *executionContext) marshalNBlogPost2ᚕᚖcomᚗmethompsonᚋgoᚑtest�
 	return ret
 }
 
-func (ec *executionContext) marshalNBlogPost2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPost(ctx context.Context, sel ast.SelectionSet, v *model.BlogPost) graphql.Marshaler {
+func (ec *executionContext) marshalNBlogPost2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPost(ctx context.Context, sel ast.SelectionSet, v *model.BlogPost) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4501,11 +4509,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNPage2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPage(ctx context.Context, sel ast.SelectionSet, v model.Page) graphql.Marshaler {
+func (ec *executionContext) marshalNPage2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPage(ctx context.Context, sel ast.SelectionSet, v model.Page) graphql.Marshaler {
 	return ec._Page(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPage2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Page) graphql.Marshaler {
+func (ec *executionContext) marshalNPage2ᚕᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Page) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4529,7 +4537,7 @@ func (ec *executionContext) marshalNPage2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgr
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNPage2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPage(ctx, sel, v[i])
+			ret[i] = ec.marshalNPage2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPage(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4542,7 +4550,7 @@ func (ec *executionContext) marshalNPage2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgr
 	return ret
 }
 
-func (ec *executionContext) marshalNPage2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPage(ctx context.Context, sel ast.SelectionSet, v *model.Page) graphql.Marshaler {
+func (ec *executionContext) marshalNPage2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPage(ctx context.Context, sel ast.SelectionSet, v *model.Page) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4552,7 +4560,7 @@ func (ec *executionContext) marshalNPage2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraph
 	return ec._Page(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSignupUser2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐSignupUser(ctx context.Context, v interface{}) (model.SignupUser, error) {
+func (ec *executionContext) unmarshalNSignupUser2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐSignupUser(ctx context.Context, v interface{}) (model.SignupUser, error) {
 	return ec.unmarshalInputSignupUser(ctx, v)
 }
 
@@ -4570,11 +4578,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNUser2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4598,7 +4606,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgr
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4611,7 +4619,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖcomᚗmethompsonᚋgoᚑtestᚋgr
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4847,27 +4855,27 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) unmarshalOBlogFilter2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogFilter(ctx context.Context, v interface{}) (model.BlogFilter, error) {
+func (ec *executionContext) unmarshalOBlogFilter2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogFilter(ctx context.Context, v interface{}) (model.BlogFilter, error) {
 	return ec.unmarshalInputBlogFilter(ctx, v)
 }
 
-func (ec *executionContext) unmarshalOBlogFilter2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogFilter(ctx context.Context, v interface{}) (*model.BlogFilter, error) {
+func (ec *executionContext) unmarshalOBlogFilter2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogFilter(ctx context.Context, v interface{}) (*model.BlogFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalOBlogFilter2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogFilter(ctx, v)
+	res, err := ec.unmarshalOBlogFilter2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogFilter(ctx, v)
 	return &res, err
 }
 
-func (ec *executionContext) unmarshalOBlogPostInput2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPostInput(ctx context.Context, v interface{}) (model.BlogPostInput, error) {
+func (ec *executionContext) unmarshalOBlogPostInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx context.Context, v interface{}) (model.BlogPostInput, error) {
 	return ec.unmarshalInputBlogPostInput(ctx, v)
 }
 
-func (ec *executionContext) unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPostInput(ctx context.Context, v interface{}) (*model.BlogPostInput, error) {
+func (ec *executionContext) unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx context.Context, v interface{}) (*model.BlogPostInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalOBlogPostInput2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐBlogPostInput(ctx, v)
+	res, err := ec.unmarshalOBlogPostInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx, v)
 	return &res, err
 }
 
@@ -4949,27 +4957,27 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return ec.marshalOID2string(ctx, sel, *v)
 }
 
-func (ec *executionContext) unmarshalOPageFilter2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageFilter(ctx context.Context, v interface{}) (model.PageFilter, error) {
+func (ec *executionContext) unmarshalOPageFilter2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageFilter(ctx context.Context, v interface{}) (model.PageFilter, error) {
 	return ec.unmarshalInputPageFilter(ctx, v)
 }
 
-func (ec *executionContext) unmarshalOPageFilter2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageFilter(ctx context.Context, v interface{}) (*model.PageFilter, error) {
+func (ec *executionContext) unmarshalOPageFilter2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageFilter(ctx context.Context, v interface{}) (*model.PageFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalOPageFilter2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageFilter(ctx, v)
+	res, err := ec.unmarshalOPageFilter2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageFilter(ctx, v)
 	return &res, err
 }
 
-func (ec *executionContext) unmarshalOPageInput2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageInput(ctx context.Context, v interface{}) (model.PageInput, error) {
+func (ec *executionContext) unmarshalOPageInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx context.Context, v interface{}) (model.PageInput, error) {
 	return ec.unmarshalInputPageInput(ctx, v)
 }
 
-func (ec *executionContext) unmarshalOPageInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageInput(ctx context.Context, v interface{}) (*model.PageInput, error) {
+func (ec *executionContext) unmarshalOPageInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx context.Context, v interface{}) (*model.PageInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalOPageInput2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐPageInput(ctx, v)
+	res, err := ec.unmarshalOPageInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx, v)
 	return &res, err
 }
 
@@ -4996,27 +5004,27 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return ec.marshalOString2string(ctx, sel, *v)
 }
 
-func (ec *executionContext) unmarshalOUserFilter2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserFilter(ctx context.Context, v interface{}) (model.UserFilter, error) {
+func (ec *executionContext) unmarshalOUserFilter2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserFilter(ctx context.Context, v interface{}) (model.UserFilter, error) {
 	return ec.unmarshalInputUserFilter(ctx, v)
 }
 
-func (ec *executionContext) unmarshalOUserFilter2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserFilter(ctx context.Context, v interface{}) (*model.UserFilter, error) {
+func (ec *executionContext) unmarshalOUserFilter2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserFilter(ctx context.Context, v interface{}) (*model.UserFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalOUserFilter2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserFilter(ctx, v)
+	res, err := ec.unmarshalOUserFilter2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
 	return &res, err
 }
 
-func (ec *executionContext) unmarshalOUserInput2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserInput(ctx context.Context, v interface{}) (model.UserInput, error) {
+func (ec *executionContext) unmarshalOUserInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx context.Context, v interface{}) (model.UserInput, error) {
 	return ec.unmarshalInputUserInput(ctx, v)
 }
 
-func (ec *executionContext) unmarshalOUserInput2ᚖcomᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserInput(ctx context.Context, v interface{}) (*model.UserInput, error) {
+func (ec *executionContext) unmarshalOUserInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx context.Context, v interface{}) (*model.UserInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalOUserInput2comᚗmethompsonᚋgoᚑtestᚋgraphᚋmodelᚐUserInput(ctx, v)
+	res, err := ec.unmarshalOUserInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx, v)
 	return &res, err
 }
 
