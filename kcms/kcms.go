@@ -23,7 +23,7 @@ type KCMS struct {
 
 // MakeKCMS will create a KCMS struct and return based upon configuration or panic
 func MakeKCMS() KCMS {
-	fmt.Println("Making KCMS")
+	// fmt.Println("Making KCMS")
 	config := configuration.ReadConfig()
 
 	var cms KCMS
@@ -31,9 +31,7 @@ func MakeKCMS() KCMS {
 
 	// Check if the MySQL configuration is empty
 	if (config.DB.Mysqldb != configuration.MySQLConfig{}) {
-		dbController := mysqlcontroller.GetMysqlDb(config.DB.Mysqldb)
-		cms = makeMySQLKcms(dbController)
-		cms.JWTSecret = config.JWTSecret
+		cms = makeMySQLKcms(config)
 
 		// Check if the MongoDB configuration is empty
 	} else if (config.DB.Mongodb != configuration.MongoDBConfig{}) {
@@ -48,7 +46,10 @@ func MakeKCMS() KCMS {
 }
 
 // MakeMySQLKcms will generate a KCMS object with a MySQL database
-func makeMySQLKcms(dbInstance mysqlcontroller.MySQLCMS) KCMS {
+func makeMySQLKcms(config configuration.Configuration) KCMS {
+	// func makeMySQLKcms(dbInstance mysqlcontroller.MySQLCMS) KCMS {
+	dbInstance := mysqlcontroller.GetMysqlDb(config.DB.Mysqldb)
+
 	cms := KCMS{
 		BlogPostController: blogpostcontroller.MySQLBlogPostController{
 			Controller: dbInstance,
@@ -60,6 +61,8 @@ func makeMySQLKcms(dbInstance mysqlcontroller.MySQLCMS) KCMS {
 			Controller: dbInstance,
 		},
 	}
+
+	cms.JWTSecret = config.JWTSecret
 
 	return cms
 }

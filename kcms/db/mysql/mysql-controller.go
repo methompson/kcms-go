@@ -2,7 +2,6 @@ package mysqlcontroller
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 
@@ -30,12 +29,6 @@ Required variables for a MySQL database include:
 The user can specify a port, but if not specified, the default port is 3306
 */
 func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
-	if config.Port == "" {
-		fmt.Println("It's empty")
-	} else {
-		fmt.Println("it's not empty '", config.Host, "'")
-	}
-
 	// Checking empty strings
 	if config.Host == "" ||
 		config.DatabaseName == "" ||
@@ -51,7 +44,7 @@ func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
 
 	mySQLConnectionString := config.Username + ":" + config.Password +
 		"@tcp(" + config.Host + ":" + port + ")/" +
-		config.DatabaseName
+		config.DatabaseName + "?clientFoundRows=true"
 
 	db, err := sql.Open("mysql", mySQLConnectionString)
 	if err != nil {
@@ -71,7 +64,6 @@ func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
 		panic(queryErr)
 	}
 
-	fmt.Println("Query Results")
 	for results.Next() {
 		var name string
 		var id int
@@ -79,7 +71,7 @@ func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(id, name)
+		// log.Println(id, name)
 	}
 
 	return cms

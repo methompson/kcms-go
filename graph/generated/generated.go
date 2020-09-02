@@ -56,15 +56,15 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddBlogPost    func(childComplexity int, input *model.BlogPostInput) int
-		AddPage        func(childComplexity int, input *model.PageInput) int
-		AddUser        func(childComplexity int, input *model.UserInput) int
+		AddBlogPost    func(childComplexity int, input model.BlogPostInput) int
+		AddPage        func(childComplexity int, input model.PageInput) int
+		AddUser        func(childComplexity int, input model.AddUserInput) int
 		DeleteBlogPost func(childComplexity int, id string) int
 		DeletePage     func(childComplexity int, id string) int
 		DeleteUser     func(childComplexity int, id string) int
-		EditBlogPost   func(childComplexity int, id string, input *model.BlogPostInput) int
-		EditPage       func(childComplexity int, id string, input *model.PageInput) int
-		EditUser       func(childComplexity int, id string, input *model.UserInput) int
+		EditBlogPost   func(childComplexity int, id string, input model.BlogPostInput) int
+		EditPage       func(childComplexity int, id string, input model.PageInput) int
+		EditUser       func(childComplexity int, input model.EditUserInput) int
 		Login          func(childComplexity int, email *string, username *string, password string) int
 		Signup         func(childComplexity int, user model.SignupUser) int
 	}
@@ -87,7 +87,7 @@ type ComplexityRoot struct {
 
 	User struct {
 		DateAdded   func(childComplexity int) int
-		DateUpdaetd func(childComplexity int) int
+		DateUpdated func(childComplexity int) int
 		Email       func(childComplexity int) int
 		Enabled     func(childComplexity int) int
 		FirstName   func(childComplexity int) int
@@ -100,14 +100,14 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	AddUser(ctx context.Context, input *model.UserInput) (*model.User, error)
-	EditUser(ctx context.Context, id string, input *model.UserInput) (*model.User, error)
+	AddUser(ctx context.Context, input model.AddUserInput) (string, error)
+	EditUser(ctx context.Context, input model.EditUserInput) (string, error)
 	DeleteUser(ctx context.Context, id string) (string, error)
-	AddPage(ctx context.Context, input *model.PageInput) (*model.Page, error)
-	EditPage(ctx context.Context, id string, input *model.PageInput) (*model.Page, error)
+	AddPage(ctx context.Context, input model.PageInput) (string, error)
+	EditPage(ctx context.Context, id string, input model.PageInput) (string, error)
 	DeletePage(ctx context.Context, id string) (string, error)
-	AddBlogPost(ctx context.Context, input *model.BlogPostInput) (*model.BlogPost, error)
-	EditBlogPost(ctx context.Context, id string, input *model.BlogPostInput) (*model.BlogPost, error)
+	AddBlogPost(ctx context.Context, input model.BlogPostInput) (string, error)
+	EditBlogPost(ctx context.Context, id string, input model.BlogPostInput) (string, error)
 	DeleteBlogPost(ctx context.Context, id string) (string, error)
 	Login(ctx context.Context, email *string, username *string, password string) (string, error)
 	Signup(ctx context.Context, user model.SignupUser) (string, error)
@@ -206,7 +206,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddBlogPost(childComplexity, args["input"].(*model.BlogPostInput)), true
+		return e.complexity.Mutation.AddBlogPost(childComplexity, args["input"].(model.BlogPostInput)), true
 
 	case "Mutation.addPage":
 		if e.complexity.Mutation.AddPage == nil {
@@ -218,7 +218,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddPage(childComplexity, args["input"].(*model.PageInput)), true
+		return e.complexity.Mutation.AddPage(childComplexity, args["input"].(model.PageInput)), true
 
 	case "Mutation.addUser":
 		if e.complexity.Mutation.AddUser == nil {
@@ -230,7 +230,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddUser(childComplexity, args["input"].(*model.UserInput)), true
+		return e.complexity.Mutation.AddUser(childComplexity, args["input"].(model.AddUserInput)), true
 
 	case "Mutation.deleteBlogPost":
 		if e.complexity.Mutation.DeleteBlogPost == nil {
@@ -278,7 +278,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EditBlogPost(childComplexity, args["id"].(string), args["input"].(*model.BlogPostInput)), true
+		return e.complexity.Mutation.EditBlogPost(childComplexity, args["id"].(string), args["input"].(model.BlogPostInput)), true
 
 	case "Mutation.editPage":
 		if e.complexity.Mutation.EditPage == nil {
@@ -290,7 +290,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EditPage(childComplexity, args["id"].(string), args["input"].(*model.PageInput)), true
+		return e.complexity.Mutation.EditPage(childComplexity, args["id"].(string), args["input"].(model.PageInput)), true
 
 	case "Mutation.editUser":
 		if e.complexity.Mutation.EditUser == nil {
@@ -302,7 +302,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EditUser(childComplexity, args["id"].(string), args["input"].(*model.UserInput)), true
+		return e.complexity.Mutation.EditUser(childComplexity, args["input"].(model.EditUserInput)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -420,12 +420,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.DateAdded(childComplexity), true
 
-	case "User.dateUpdaetd":
-		if e.complexity.User.DateUpdaetd == nil {
+	case "User.dateUpdated":
+		if e.complexity.User.DateUpdated == nil {
 			break
 		}
 
-		return e.complexity.User.DateUpdaetd(childComplexity), true
+		return e.complexity.User.DateUpdated(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -583,7 +583,7 @@ type User {
   userType: String!
   userMeta: String!
   dateAdded: Int!
-  dateUpdaetd: Int!
+  dateUpdated: Int!
   enabled: Boolean!
 }
 
@@ -593,7 +593,7 @@ input UserFilter {
   userType: String
 }
 
-input UserInput {
+input AddUserInput {
   firstName: String
   lastName: String
   username: String!
@@ -602,6 +602,18 @@ input UserInput {
   userMeta: String
   enabled: Boolean
   password: String!
+}
+
+input EditUserInput {
+  id: ID!
+  firstName: String
+  lastName: String
+  username: String
+  email: String
+  userType: String
+  userMeta: String
+  enabled: Boolean
+  password: String
 }
 
 type BlogPost {
@@ -648,20 +660,20 @@ type Query {
 }
 
 type Mutation {
-  addUser(input: UserInput): User!
-  editUser(id: ID!, input: UserInput): User!
+  addUser(input: AddUserInput!): ID!
+  editUser(input: EditUserInput!): ID!
   deleteUser(id: ID!): ID!
 
-  addPage(input: PageInput): Page!
-  editPage(id: ID!, input: PageInput): Page!
+  addPage(input: PageInput!): ID!
+  editPage(id: ID!, input: PageInput!): ID!
   deletePage(id: ID!): ID!
 
-  addBlogPost(input: BlogPostInput): BlogPost!
-  editBlogPost(id: ID!, input: BlogPostInput): BlogPost!
+  addBlogPost(input: BlogPostInput!): ID!
+  editBlogPost(id: ID!, input: BlogPostInput!): ID!
   deleteBlogPost(id: ID!): ID!
 
   login(email: String, username: String, password: String!): String!
-  signup(user: SignupUser!): String!
+  signup(user: SignupUser!): ID!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -673,9 +685,9 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_addBlogPost_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.BlogPostInput
+	var arg0 model.BlogPostInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx, tmp)
+		arg0, err = ec.unmarshalNBlogPostInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -687,9 +699,9 @@ func (ec *executionContext) field_Mutation_addBlogPost_args(ctx context.Context,
 func (ec *executionContext) field_Mutation_addPage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.PageInput
+	var arg0 model.PageInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalOPageInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx, tmp)
+		arg0, err = ec.unmarshalNPageInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -701,9 +713,9 @@ func (ec *executionContext) field_Mutation_addPage_args(ctx context.Context, raw
 func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.UserInput
+	var arg0 model.AddUserInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalOUserInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalNAddUserInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐAddUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -765,9 +777,9 @@ func (ec *executionContext) field_Mutation_editBlogPost_args(ctx context.Context
 		}
 	}
 	args["id"] = arg0
-	var arg1 *model.BlogPostInput
+	var arg1 model.BlogPostInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg1, err = ec.unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx, tmp)
+		arg1, err = ec.unmarshalNBlogPostInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -787,9 +799,9 @@ func (ec *executionContext) field_Mutation_editPage_args(ctx context.Context, ra
 		}
 	}
 	args["id"] = arg0
-	var arg1 *model.PageInput
+	var arg1 model.PageInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg1, err = ec.unmarshalOPageInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx, tmp)
+		arg1, err = ec.unmarshalNPageInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -801,22 +813,14 @@ func (ec *executionContext) field_Mutation_editPage_args(ctx context.Context, ra
 func (ec *executionContext) field_Mutation_editUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 *model.UserInput
+	var arg0 model.EditUserInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg1, err = ec.unmarshalOUserInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx, tmp)
+		arg0, err = ec.unmarshalNEditUserInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐEditUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg1
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1286,7 +1290,7 @@ func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddUser(rctx, args["input"].(*model.UserInput))
+		return ec.resolvers.Mutation().AddUser(rctx, args["input"].(model.AddUserInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1298,9 +1302,9 @@ func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNUser2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_editUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1327,7 +1331,7 @@ func (ec *executionContext) _Mutation_editUser(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EditUser(rctx, args["id"].(string), args["input"].(*model.UserInput))
+		return ec.resolvers.Mutation().EditUser(rctx, args["input"].(model.EditUserInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1339,9 +1343,9 @@ func (ec *executionContext) _Mutation_editUser(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNUser2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1409,7 +1413,7 @@ func (ec *executionContext) _Mutation_addPage(ctx context.Context, field graphql
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddPage(rctx, args["input"].(*model.PageInput))
+		return ec.resolvers.Mutation().AddPage(rctx, args["input"].(model.PageInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1421,9 +1425,9 @@ func (ec *executionContext) _Mutation_addPage(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Page)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNPage2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPage(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_editPage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1450,7 +1454,7 @@ func (ec *executionContext) _Mutation_editPage(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EditPage(rctx, args["id"].(string), args["input"].(*model.PageInput))
+		return ec.resolvers.Mutation().EditPage(rctx, args["id"].(string), args["input"].(model.PageInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1462,9 +1466,9 @@ func (ec *executionContext) _Mutation_editPage(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Page)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNPage2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPage(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deletePage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1532,7 +1536,7 @@ func (ec *executionContext) _Mutation_addBlogPost(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddBlogPost(rctx, args["input"].(*model.BlogPostInput))
+		return ec.resolvers.Mutation().AddBlogPost(rctx, args["input"].(model.BlogPostInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1544,9 +1548,9 @@ func (ec *executionContext) _Mutation_addBlogPost(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.BlogPost)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBlogPost2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPost(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_editBlogPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1573,7 +1577,7 @@ func (ec *executionContext) _Mutation_editBlogPost(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EditBlogPost(rctx, args["id"].(string), args["input"].(*model.BlogPostInput))
+		return ec.resolvers.Mutation().EditBlogPost(rctx, args["id"].(string), args["input"].(model.BlogPostInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1585,9 +1589,9 @@ func (ec *executionContext) _Mutation_editBlogPost(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.BlogPost)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBlogPost2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPost(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteBlogPost(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1710,7 +1714,7 @@ func (ec *executionContext) _Mutation_signup(ctx context.Context, field graphql.
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Page_id(ctx context.Context, field graphql.CollectedField, obj *model.Page) (ret graphql.Marshaler) {
@@ -2409,7 +2413,7 @@ func (ec *executionContext) _User_dateAdded(ctx context.Context, field graphql.C
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_dateUpdaetd(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_dateUpdated(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2426,7 +2430,7 @@ func (ec *executionContext) _User_dateUpdaetd(ctx context.Context, field graphql
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DateUpdaetd, nil
+		return obj.DateUpdated, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3532,6 +3536,66 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj interface{}) (model.AddUserInput, error) {
+	var it model.AddUserInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "firstName":
+			var err error
+			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lastName":
+			var err error
+			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email":
+			var err error
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userType":
+			var err error
+			it.UserType, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userMeta":
+			var err error
+			it.UserMeta, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "enabled":
+			var err error
+			it.Enabled, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputBlogFilter(ctx context.Context, obj interface{}) (model.BlogFilter, error) {
 	var it model.BlogFilter
 	var asMap = obj.(map[string]interface{})
@@ -3595,6 +3659,72 @@ func (ec *executionContext) unmarshalInputBlogPostInput(ctx context.Context, obj
 		case "meta":
 			var err error
 			it.Meta, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEditUserInput(ctx context.Context, obj interface{}) (model.EditUserInput, error) {
+	var it model.EditUserInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "firstName":
+			var err error
+			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lastName":
+			var err error
+			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+			it.Username, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email":
+			var err error
+			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userType":
+			var err error
+			it.UserType, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "userMeta":
+			var err error
+			it.UserMeta, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "enabled":
+			var err error
+			it.Enabled, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3751,66 +3881,6 @@ func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj in
 		case "userType":
 			var err error
 			it.UserType, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj interface{}) (model.UserInput, error) {
-	var it model.UserInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "firstName":
-			var err error
-			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "lastName":
-			var err error
-			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "username":
-			var err error
-			it.Username, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "email":
-			var err error
-			it.Email, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "userType":
-			var err error
-			it.UserType, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "userMeta":
-			var err error
-			it.UserMeta, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "enabled":
-			var err error
-			it.Enabled, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4150,8 +4220,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "dateUpdaetd":
-			out.Values[i] = ec._User_dateUpdaetd(ctx, field, obj)
+		case "dateUpdated":
+			out.Values[i] = ec._User_dateUpdated(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4416,6 +4486,10 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) unmarshalNAddUserInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐAddUserInput(ctx context.Context, v interface{}) (model.AddUserInput, error) {
+	return ec.unmarshalInputAddUserInput(ctx, v)
+}
+
 func (ec *executionContext) marshalNBlogPost2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPost(ctx context.Context, sel ast.SelectionSet, v model.BlogPost) graphql.Marshaler {
 	return ec._BlogPost(ctx, sel, &v)
 }
@@ -4467,6 +4541,10 @@ func (ec *executionContext) marshalNBlogPost2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋg
 	return ec._BlogPost(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNBlogPostInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx context.Context, v interface{}) (model.BlogPostInput, error) {
+	return ec.unmarshalInputBlogPostInput(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -4479,6 +4557,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNEditUserInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐEditUserInput(ctx context.Context, v interface{}) (model.EditUserInput, error) {
+	return ec.unmarshalInputEditUserInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
@@ -4558,6 +4640,10 @@ func (ec *executionContext) marshalNPage2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraph
 		return graphql.Null
 	}
 	return ec._Page(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPageInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx context.Context, v interface{}) (model.PageInput, error) {
+	return ec.unmarshalInputPageInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNSignupUser2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐSignupUser(ctx context.Context, v interface{}) (model.SignupUser, error) {
@@ -4867,18 +4953,6 @@ func (ec *executionContext) unmarshalOBlogFilter2ᚖcomᚗmethompsonᚋkcmsᚑgo
 	return &res, err
 }
 
-func (ec *executionContext) unmarshalOBlogPostInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx context.Context, v interface{}) (model.BlogPostInput, error) {
-	return ec.unmarshalInputBlogPostInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalOBlogPostInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx context.Context, v interface{}) (*model.BlogPostInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOBlogPostInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐBlogPostInput(ctx, v)
-	return &res, err
-}
-
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -4969,18 +5043,6 @@ func (ec *executionContext) unmarshalOPageFilter2ᚖcomᚗmethompsonᚋkcmsᚑgo
 	return &res, err
 }
 
-func (ec *executionContext) unmarshalOPageInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx context.Context, v interface{}) (model.PageInput, error) {
-	return ec.unmarshalInputPageInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalOPageInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx context.Context, v interface{}) (*model.PageInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOPageInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐPageInput(ctx, v)
-	return &res, err
-}
-
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	return graphql.UnmarshalString(v)
 }
@@ -5013,18 +5075,6 @@ func (ec *executionContext) unmarshalOUserFilter2ᚖcomᚗmethompsonᚋkcmsᚑgo
 		return nil, nil
 	}
 	res, err := ec.unmarshalOUserFilter2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserFilter(ctx, v)
-	return &res, err
-}
-
-func (ec *executionContext) unmarshalOUserInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx context.Context, v interface{}) (model.UserInput, error) {
-	return ec.unmarshalInputUserInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalOUserInput2ᚖcomᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx context.Context, v interface{}) (*model.UserInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalOUserInput2comᚗmethompsonᚋkcmsᚑgoᚋgraphᚋmodelᚐUserInput(ctx, v)
 	return &res, err
 }
 

@@ -7,117 +7,110 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/99designs/gqlgen/graphql"
-
 	"com.methompson/kcms-go/graph/generated"
 	"com.methompson/kcms-go/graph/model"
+	"com.methompson/kcms-go/kcms/controllers/usercontroller"
 	"com.methompson/kcms-go/kcms/headers"
+	"github.com/99designs/gqlgen/graphql"
 )
 
-func (r *mutationResolver) AddUser(ctx context.Context, input *model.UserInput) (*model.User, error) {
-	var emptyStr string = ""
+func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (string, error) {
+	// This is a reference
+	authToken := headers.GetHeaderAuth(ctx)
 
-	user := &model.User{
-		ID:          "",
-		FirstName:   &emptyStr,
-		LastName:    &emptyStr,
-		Username:    "",
-		Email:       "",
-		UserType:    "",
-		UserMeta:    "",
-		DateAdded:   1,
-		DateUpdaetd: 1,
-		Enabled:     true,
+	fmt.Println(input)
+	userData := usercontroller.ConvertAddUserInputToInputUser(input)
+
+	id, err := r.KCMS.UserController.AddUser(userData, authToken)
+
+	if err != nil {
+		return "", err
 	}
 
-	return user, nil
+	return id, nil
 }
 
-func (r *mutationResolver) EditUser(ctx context.Context, id string, input *model.UserInput) (*model.User, error) {
-	var emptyStr string = ""
+func (r *mutationResolver) EditUser(ctx context.Context, input model.EditUserInput) (string, error) {
+	authToken := headers.GetHeaderAuth(ctx)
 
-	user := &model.User{
-		ID:          "",
-		FirstName:   &emptyStr,
-		LastName:    &emptyStr,
-		Username:    "",
-		Email:       "",
-		UserType:    "",
-		UserMeta:    "",
-		DateAdded:   1,
-		DateUpdaetd: 1,
-		Enabled:     true,
+	fmt.Println(input)
+	userData := usercontroller.ConvertEditUserInputToInputUser(input)
+
+	id, err := r.KCMS.UserController.EditUser(userData, authToken)
+
+	if err != nil {
+		return "", err
 	}
 
-	return user, nil
+	return id, nil
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (string, error) {
 	return "69", nil
 }
 
-func (r *mutationResolver) AddPage(ctx context.Context, input *model.PageInput) (*model.Page, error) {
-	page := &model.Page{
-		ID:          "1",
-		Slug:        "my-slug",
-		Enabled:     true,
-		Content:     "[]",
-		Meta:        "{}",
-		DateAdded:   1,
-		DateUpdated: 1,
-	}
+func (r *mutationResolver) AddPage(ctx context.Context, input model.PageInput) (string, error) {
+	// page := &model.Page{
+	// 	ID:          "1",
+	// 	Slug:        "my-slug",
+	// 	Enabled:     true,
+	// 	Content:     "[]",
+	// 	Meta:        "{}",
+	// 	DateAdded:   1,
+	// 	DateUpdated: 1,
+	// }
 
-	return page, nil
+	return "69", nil
 }
 
-func (r *mutationResolver) EditPage(ctx context.Context, id string, input *model.PageInput) (*model.Page, error) {
-	page := &model.Page{
-		ID:          "1",
-		Slug:        "my-slug",
-		Enabled:     true,
-		Content:     "[]",
-		Meta:        "{}",
-		DateAdded:   1,
-		DateUpdated: 1,
-	}
+func (r *mutationResolver) EditPage(ctx context.Context, id string, input model.PageInput) (string, error) {
+	// page := &model.Page{
+	// 	ID:          "1",
+	// 	Slug:        "my-slug",
+	// 	Enabled:     true,
+	// 	Content:     "[]",
+	// 	Meta:        "{}",
+	// 	DateAdded:   1,
+	// 	DateUpdated: 1,
+	// }
 
-	return page, nil
+	return "69", nil
 }
 
 func (r *mutationResolver) DeletePage(ctx context.Context, id string) (string, error) {
 	return "69", nil
 }
 
-func (r *mutationResolver) AddBlogPost(ctx context.Context, input *model.BlogPostInput) (*model.BlogPost, error) {
-	post := &model.BlogPost{
-		ID:          "",
-		Name:        "",
-		Slug:        "",
-		Draft:       true,
-		Public:      true,
-		Content:     "",
-		Meta:        "",
-		DateAdded:   1,
-		DateUpdated: 1,
-	}
+func (r *mutationResolver) AddBlogPost(ctx context.Context, input model.BlogPostInput) (string, error) {
+	// post := &model.BlogPost{
+	// 	ID:          "",
+	// 	Name:        "",
+	// 	Slug:        "",
+	// 	Draft:       true,
+	// 	Public:      true,
+	// 	Content:     "",
+	// 	Meta:        "",
+	// 	DateAdded:   1,
+	// 	DateUpdated: 1,
+	// }
 
-	return post, nil
+	return "69", nil
 }
 
-func (r *mutationResolver) EditBlogPost(ctx context.Context, id string, input *model.BlogPostInput) (*model.BlogPost, error) {
-	post := &model.BlogPost{
-		ID:          "",
-		Name:        "",
-		Slug:        "",
-		Draft:       true,
-		Public:      true,
-		Content:     "",
-		Meta:        "",
-		DateAdded:   1,
-		DateUpdated: 1,
-	}
+func (r *mutationResolver) EditBlogPost(ctx context.Context, id string, input model.BlogPostInput) (string, error) {
+	// post := &model.BlogPost{
+	// 	ID:          "",
+	// 	Name:        "",
+	// 	Slug:        "",
+	// 	Draft:       true,
+	// 	Public:      true,
+	// 	Content:     "",
+	// 	Meta:        "",
+	// 	DateAdded:   1,
+	// 	DateUpdated: 1,
+	// }
 
-	return post, nil
+	return "69", nil
 }
 
 func (r *mutationResolver) DeleteBlogPost(ctx context.Context, id string) (string, error) {
@@ -125,7 +118,7 @@ func (r *mutationResolver) DeleteBlogPost(ctx context.Context, id string) (strin
 }
 
 func (r *mutationResolver) Login(ctx context.Context, email *string, username *string, password string) (string, error) {
-	token, err := r.KCMS.UserController.LogUserIn(email, username, password)
+	token, err := r.KCMS.UserController.LogUserIn(email, username, password, r.KCMS.JWTSecret)
 
 	if err != "" {
 		graphql.AddErrorf(ctx, err)
@@ -137,12 +130,6 @@ func (r *mutationResolver) Login(ctx context.Context, email *string, username *s
 func (r *mutationResolver) Signup(ctx context.Context, user model.SignupUser) (string, error) {
 	// headers.GetHeaderAuth(ctx)
 
-	// This is a reference
-	authToken := headers.GetHeaderAuth(ctx)
-	fmt.Println(authToken)
-	// fmt.Println(authToken["iat"])
-	// claimsType := fmt.Sprintf("%T", authToken)
-	// fmt.Println("resolver", claimsType, authToken)
 	return "321", nil
 }
 
@@ -179,7 +166,7 @@ func (r *queryResolver) Users(ctx context.Context, userFilter *model.UserFilter)
 		UserType:    "",
 		UserMeta:    "",
 		DateAdded:   1,
-		DateUpdaetd: 1,
+		DateUpdated: 1,
 		Enabled:     true,
 	}
 

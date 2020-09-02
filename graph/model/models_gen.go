@@ -2,6 +2,17 @@
 
 package model
 
+type AddUserInput struct {
+	FirstName *string `json:"firstName"`
+	LastName  *string `json:"lastName"`
+	Username  string  `json:"username"`
+	Email     string  `json:"email"`
+	UserType  *string `json:"userType"`
+	UserMeta  *string `json:"userMeta"`
+	Enabled   *bool   `json:"enabled"`
+	Password  string  `json:"password"`
+}
+
 type BlogFilter struct {
 	ID   *string `json:"id"`
 	Slug *string `json:"slug"`
@@ -26,6 +37,18 @@ type BlogPostInput struct {
 	Public  *bool   `json:"public"`
 	Content string  `json:"content"`
 	Meta    *string `json:"meta"`
+}
+
+type EditUserInput struct {
+	ID        string  `json:"id"`
+	FirstName *string `json:"firstName"`
+	LastName  *string `json:"lastName"`
+	Username  *string `json:"username"`
+	Email     *string `json:"email"`
+	UserType  *string `json:"userType"`
+	UserMeta  *string `json:"userMeta"`
+	Enabled   *bool   `json:"enabled"`
+	Password  *string `json:"password"`
 }
 
 type Page struct {
@@ -71,7 +94,7 @@ type User struct {
 	UserType    string  `json:"userType"`
 	UserMeta    string  `json:"userMeta"`
 	DateAdded   int     `json:"dateAdded"`
-	DateUpdaetd int     `json:"dateUpdaetd"`
+	DateUpdated int     `json:"dateUpdated"`
 	Enabled     bool    `json:"enabled"`
 }
 
@@ -79,15 +102,4 @@ type UserFilter struct {
 	ID       *string `json:"id"`
 	Email    *string `json:"email"`
 	UserType *string `json:"userType"`
-}
-
-type UserInput struct {
-	FirstName *string `json:"firstName"`
-	LastName  *string `json:"lastName"`
-	Username  string  `json:"username"`
-	Email     string  `json:"email"`
-	UserType  *string `json:"userType"`
-	UserMeta  *string `json:"userMeta"`
-	Enabled   *bool   `json:"enabled"`
-	Password  string  `json:"password"`
 }

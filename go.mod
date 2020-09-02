@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/99designs/gqlgen v0.11.3
+	github.com/VividCortex/mysqlerr v0.0.0-20200629151747-c28746d985dd
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-sql-driver/mysql v1.5.0

@@ -53,10 +53,12 @@ func JWTExtractor(kcms kcms.KCMS) func(http.Handler) http.Handler {
 							k := authContextKey("authToken")
 							ctx := context.WithValue(r.Context(), k, claims)
 							r = r.WithContext(ctx)
+						} else {
+							// fmt.Println("Token Not Valid")
 						}
 
 					} else {
-						// fmt.Println("Token Not Decoded")
+						// fmt.Println("Token Not Decoded", err)
 					}
 				} else {
 					// fmt.Println("Empty Token")
