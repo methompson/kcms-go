@@ -1,7 +1,6 @@
 package usercontroller
 
 import (
-	"fmt"
 	"regexp"
 	"time"
 
@@ -16,8 +15,9 @@ import (
 type UserController interface {
 	CheckPassword(user User, password string) bool
 	GetUserTypes() map[string]UserType
-	CanAddUser(userType string) bool
-	CanEditUser(userType string, userData InputUserData) bool
+	GetUserType(userType string) UserType
+	CanAddUser(userType UserType) bool
+	CanEditUser(userType UserType) bool
 	GetUserRequestToken()
 	IsEmailValid(email string) bool
 
@@ -27,13 +27,14 @@ type UserController interface {
 	GetUserByUsername(username string) User
 	AddUser(userData InputUserData, authToken *jwtuserdata.JWTUserData) (string, error)
 	EditUser(userData InputUserData, authToken *jwtuserdata.JWTUserData) (string, error)
-	DeleteUser()
+	DeleteUser(id string, authToken *jwtuserdata.JWTUserData) (string, error)
 }
 
 // UserType is a convenience structure to easily find and determine the permissions of a user type
 type UserType struct {
 	UserType    string
 	Permissions []string
+	Rank        uint16
 }
 
 // InputUserData struct provides the ability to add all necessary new user data into a single structure
@@ -126,46 +127,55 @@ func (inst BaseUserController) CheckPassword(user User, password string) bool {
 // GetUserTypes gets all user types
 func (inst BaseUserController) GetUserTypes() map[string]UserType {
 	userTypes := make(map[string]UserType)
+
 	userTypes["superAdmin"] = UserType{
 		UserType:    "superAdmin",
 		Permissions: []string{"view", "edit"},
+		Rank:        ^uint16(0),
 	}
 	userTypes["admin"] = UserType{
 		UserType:    "admin",
 		Permissions: []string{"view", "edit"},
+		Rank:        ^uint16(0) - 1,
 	}
 	userTypes["editor"] = UserType{
 		UserType:    "editor",
 		Permissions: []string{"view"},
+		Rank:        32767, // All 1s except the furthest left binary digit
 	}
 	userTypes["subscriber"] = UserType{
 		UserType:    "subscriber",
 		Permissions: []string{},
+		Rank:        0, // Cannot do ANYTHING
 	}
 
 	return userTypes
 }
 
+// GetUserType gets the usertype struct from a string name of the User Type
+func (inst BaseUserController) GetUserType(userType string) UserType {
+	// If the userType doesn't actually exist, we get a zeroed version of a user type that has no permissions and a 0 rank
+	return inst.GetUserTypes()[userType]
+}
+
 // CanAddUser provides a boolean indicating whether the current user is allowed
 // to add or edit other users.
-func (inst BaseUserController) CanAddUser(userType string) bool {
-	t := inst.GetUserTypes()[userType]
+func (inst BaseUserController) CanAddUser(userType UserType) bool {
+	// t := inst.GetUserTypes()[userType]
 	result := false
 
-	for _, s := range t.Permissions {
+	for _, s := range userType.Permissions {
 		if s == "edit" {
 			result = true
 		}
 	}
-
-	fmt.Println("Can Edit", userType, t, result)
 
 	return result
 }
 
 // CanEditUser provides a boolean indicating whether the current user is allowed
 // to add or edit other users.
-func (inst BaseUserController) CanEditUser(userType string, userData InputUserData) bool {
+func (inst BaseUserController) CanEditUser(userType UserType) bool {
 	if !inst.CanAddUser(userType) {
 		return false
 	}
@@ -219,11 +229,9 @@ func (inst BaseUserController) EncodeCredentials(user User, secret string) strin
 	signedToken, err := token.SignedString([]byte(secret))
 
 	if err != nil {
-		// fmt.Println("Error with signing token", err)
 		return ""
 	}
 
-	// fmt.Println(signedToken)
 	return signedToken
 }
 
@@ -253,4 +261,6 @@ func (inst BaseUserController) EditUser(userData InputUserData, authToken *jwtus
 }
 
 // DeleteUser removes a User object from storage
-func (inst BaseUserController) DeleteUser() {}
+func (inst BaseUserController) DeleteUser(id string, authToken *jwtuserdata.JWTUserData) (string, error) {
+	return "", nil
+}

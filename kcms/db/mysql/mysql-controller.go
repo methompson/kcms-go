@@ -44,7 +44,10 @@ func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
 
 	mySQLConnectionString := config.Username + ":" + config.Password +
 		"@tcp(" + config.Host + ":" + port + ")/" +
-		config.DatabaseName + "?clientFoundRows=true"
+		config.DatabaseName
+	// mySQLConnectionString := config.Username + ":" + config.Password +
+	// 	"@tcp(" + config.Host + ":" + port + ")/" +
+	// 	config.DatabaseName + "?clientFoundRows=true"
 
 	db, err := sql.Open("mysql", mySQLConnectionString)
 	if err != nil {

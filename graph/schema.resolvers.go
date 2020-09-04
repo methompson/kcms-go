@@ -46,7 +46,14 @@ func (r *mutationResolver) EditUser(ctx context.Context, input model.EditUserInp
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (string, error) {
-	return "69", nil
+	authToken := headers.GetHeaderAuth(ctx)
+
+	_, err := r.KCMS.UserController.DeleteUser(id, authToken)
+	if err != nil {
+		return "", err
+	}
+
+	return id, nil
 }
 
 func (r *mutationResolver) AddPage(ctx context.Context, input model.PageInput) (string, error) {

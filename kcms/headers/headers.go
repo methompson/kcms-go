@@ -26,8 +26,11 @@ func JWTExtractor(kcms kcms.KCMS) func(http.Handler) http.Handler {
 				// their erroneous request.
 				for _, header := range auth {
 					if strings.HasPrefix(header, "bearer") {
-						tokenString = strings.Split(header, " ")[1]
-						break
+						tokens := strings.Split(header, " ")
+						if len(tokens) > 1 {
+							tokenString = tokens[1]
+							break
+						}
 					}
 				}
 
