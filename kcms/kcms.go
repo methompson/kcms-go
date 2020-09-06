@@ -1,8 +1,7 @@
 package kcms
 
 import (
-	"fmt"
-	"log"
+	"errors"
 
 	"com.methompson/kcms-go/kcms/configuration"
 	"com.methompson/kcms-go/kcms/controllers/blogpostcontroller"
@@ -22,33 +21,51 @@ type KCMS struct {
 }
 
 // MakeKCMS will create a KCMS struct and return based upon configuration or panic
-func MakeKCMS() KCMS {
+func MakeKCMS() (*KCMS, error) {
 	// fmt.Println("Making KCMS")
-	config := configuration.ReadConfig()
+	config, err := configuration.ReadConfig()
 
-	var cms KCMS
+	if err != nil {
+		return nil, err
+	}
+
+	var cms *KCMS
 	// We will attempt to connect a database and if our result is empty, we will panic
 
 	// Check if the MySQL configuration is empty
 	if (config.DB.Mysqldb != configuration.MySQLConfig{}) {
-		cms = makeMySQLKcms(config)
+		cms, err = makeMySQLKCMS(config)
+
+		if err != nil {
+			return nil, err
+		}
 
 		// Check if the MongoDB configuration is empty
 	} else if (config.DB.Mongodb != configuration.MongoDBConfig{}) {
-		fmt.Println("MongoDB Configuration is not empty")
+		cms, err = makeMongoDBKCMS(config)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, errors.New("mongoDB no yet implemented")
 	}
 
-	if (cms == KCMS{}) {
-		log.Panic("Empty CMS")
+	if (*cms == KCMS{}) {
+		return nil, errors.New("empty KCMS struct created")
 	}
 
-	return cms
+	return cms, nil
 }
 
 // MakeMySQLKcms will generate a KCMS object with a MySQL database
-func makeMySQLKcms(config configuration.Configuration) KCMS {
+func makeMySQLKCMS(config configuration.Configuration) (*KCMS, error) {
 	// func makeMySQLKcms(dbInstance mysqlcontroller.MySQLCMS) KCMS {
-	dbInstance := mysqlcontroller.GetMysqlDb(config.DB.Mysqldb)
+	dbInstance, err := mysqlcontroller.GetMysqlDb(config.DB.Mysqldb)
+
+	if err != nil {
+		return nil, err
+	}
 
 	cms := KCMS{
 		BlogPostController: blogpostcontroller.MySQLBlogPostController{
@@ -64,8 +81,10 @@ func makeMySQLKcms(config configuration.Configuration) KCMS {
 
 	cms.JWTSecret = config.JWTSecret
 
-	return cms
+	return &cms, nil
 }
 
 // MakeMongoDBKcms will generate a KCMS object with a MongoDB database
-func makeMongoDBKcms() {}
+func makeMongoDBKCMS(config configuration.Configuration) (*KCMS, error) {
+	return nil, errors.New("mongoDB no yet implemented")
+}

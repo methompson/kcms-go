@@ -2,7 +2,7 @@ package mysqlcontroller
 
 import (
 	"database/sql"
-	"log"
+	"errors"
 	"time"
 
 	"com.methompson/kcms-go/kcms/configuration"
@@ -28,13 +28,13 @@ Required variables for a MySQL database include:
 
 The user can specify a port, but if not specified, the default port is 3306
 */
-func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
+func GetMysqlDb(config configuration.MySQLConfig) (*MySQLCMS, error) {
 	// Checking empty strings
 	if config.Host == "" ||
 		config.DatabaseName == "" ||
 		config.Username == "" ||
 		config.Password == "" {
-		log.Panic("Invalid DB Parameters")
+		return nil, errors.New("Invalid DB Parameters")
 	}
 
 	port := config.Port
@@ -51,7 +51,7 @@ func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
 
 	db, err := sql.Open("mysql", mySQLConnectionString)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	db.SetConnMaxLifetime(time.Minute * 3)
@@ -62,20 +62,22 @@ func GetMysqlDb(config configuration.MySQLConfig) MySQLCMS {
 		Instance: db,
 	}
 
-	results, queryErr := db.Query("SELECT id, name FROM pages")
-	if queryErr != nil {
-		panic(queryErr)
+	// TODO Is this even necessary?
+	results, err := db.Query("SELECT id, name FROM pages")
+	if err != nil {
+		return nil, err
+		// panic(queryErr)
 	}
 
 	for results.Next() {
 		var name string
 		var id int
 		err = results.Scan(&id, &name)
+
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
-		// log.Println(id, name)
 	}
 
-	return cms
+	return &cms, nil
 }

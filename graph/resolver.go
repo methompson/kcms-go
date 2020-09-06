@@ -10,5 +10,5 @@ import (
 
 // Resolver is the bridge between the application and the database instance
 type Resolver struct {
-	KCMS kcms.KCMS
+	KCMS *kcms.KCMS
 }

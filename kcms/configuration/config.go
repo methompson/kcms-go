@@ -3,7 +3,6 @@ package configuration
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 )
 
 // MySQLConfig stores MySQL Configuration information for conencting to the database
@@ -35,13 +34,17 @@ type Configuration struct {
 	BlogEnabled bool     `json:"blogEnabled"`
 }
 
+var ioReadFile = ioutil.ReadFile
+var unmarshalJSON = json.Unmarshal
+
 // ReadConfig Reads Configuration Data and returns a Configuration struct
-func ReadConfig() Configuration {
+func ReadConfig() (Configuration, error) {
 	// This file is read from the perspective of the initially run file,
 	// i.e. server.go in the root directory.
-	configDat, err := ioutil.ReadFile("config.json")
+	configDat, err := ioReadFile("config.json")
 	if err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
+		return Configuration{}, err
 	}
 
 	// We create a Configuration struct with some default data. Then, we attempt to unmarshal
@@ -51,11 +54,12 @@ func ReadConfig() Configuration {
 		JWTSecret:   "secret",
 		BlogEnabled: true,
 	}
-	err = json.Unmarshal([]byte(configDat), &config)
+	err = unmarshalJSON([]byte(configDat), &config)
 
 	if err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
+		return Configuration{}, err
 	}
 
-	return config
+	return config, nil
 }

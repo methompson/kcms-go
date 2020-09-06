@@ -19,30 +19,41 @@ import (
 
 const defaultPort = "8080"
 
+var getEnvironmentVal = os.Getenv
+
 func main() {
-	port := os.Getenv("PORT")
+	cms, err := kcms.MakeKCMS()
+
+	if err != nil {
+		log.Panic("kcms not created", err)
+	}
+
+	err = makeServer(cms)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func makeServer(cms *kcms.KCMS) error {
+	srv := handler.NewDefaultServer(
+		generated.NewExecutableSchema(
+			generated.Config{
+				Resolvers: &graph.Resolver{
+					KCMS: cms,
+				},
+			},
+		),
+	)
+
+	port := getEnvironmentVal("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
-	cms := kcms.MakeKCMS()
-
-	srv := handler.
-		NewDefaultServer(
-			generated.NewExecutableSchema(
-				generated.Config{
-					Resolvers: &graph.Resolver{
-						KCMS: cms,
-					},
-				},
-			),
-		)
-
 	router := chi.NewRouter()
 
 	router.Use(headers.JWTExtractor(cms))
-
-	// fmt.Printf("Handler %T\n", srv)
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
@@ -50,6 +61,5 @@ func main() {
 	// http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
-	// log.Fatal(http.ListenAndServe(":"+port, nil))
+	return http.ListenAndServe(":"+port, router)
 }

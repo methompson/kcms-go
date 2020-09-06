@@ -10,7 +10,7 @@ import (
 // implementations for retrieving data
 type MySQLPageController struct {
 	BasePageController
-	Controller mysqlcontroller.MySQLCMS
+	Controller *mysqlcontroller.MySQLCMS
 }
 
 // GetPageByID gets a page object using an id

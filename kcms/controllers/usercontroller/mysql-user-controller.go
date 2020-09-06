@@ -18,7 +18,7 @@ import (
 // for retrieving data
 type MySQLUserController struct {
 	BaseUserController
-	Controller mysqlcontroller.MySQLCMS
+	Controller *mysqlcontroller.MySQLCMS
 }
 
 func (inst MySQLUserController) getUserFromQuery(query string, parameter string) User {
@@ -33,6 +33,7 @@ func (inst MySQLUserController) getUserFromQuery(query string, parameter string)
 
 	for rows.Next() {
 		err = rows.Scan(&user.id, &user.firstName, &user.lastName, &user.username, &user.email, &user.userType, &user.password, &user.userMeta)
+		// TODO Fix this error and stop logging fatal
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -41,6 +42,7 @@ func (inst MySQLUserController) getUserFromQuery(query string, parameter string)
 
 	err = rows.Err()
 	if err != nil {
+		// TODO Fix this error and stop logging fatal
 		log.Fatal(err)
 	}
 

@@ -14,7 +14,7 @@ import (
 type authContextKey string
 
 // JWTExtractor extracts the bearer token from the headers of a request and inserts it into the request context
-func JWTExtractor(kcms kcms.KCMS) func(http.Handler) http.Handler {
+func JWTExtractor(kcms *kcms.KCMS) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			auth := r.Header["Authorization"]

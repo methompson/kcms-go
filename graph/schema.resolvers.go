@@ -9,17 +9,18 @@ import (
 
 	"com.methompson/kcms-go/graph/generated"
 	"com.methompson/kcms-go/graph/model"
-	"com.methompson/kcms-go/kcms/controllers/usercontroller"
 	"com.methompson/kcms-go/kcms/headers"
 	"github.com/99designs/gqlgen/graphql"
 )
 
+var getHeaderAuth = headers.GetHeaderAuth
+
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (string, error) {
 	// This is a reference
-	authToken := headers.GetHeaderAuth(ctx)
+	authToken := getHeaderAuth(ctx)
 
 	fmt.Println(input)
-	userData := usercontroller.ConvertAddUserInputToInputUser(input)
+	userData := r.KCMS.UserController.ConvertAddUserInputToInputUser(input)
 
 	id, err := r.KCMS.UserController.AddUser(userData, authToken)
 
@@ -31,10 +32,10 @@ func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput
 }
 
 func (r *mutationResolver) EditUser(ctx context.Context, input model.EditUserInput) (string, error) {
-	authToken := headers.GetHeaderAuth(ctx)
+	authToken := getHeaderAuth(ctx)
 
 	fmt.Println(input)
-	userData := usercontroller.ConvertEditUserInputToInputUser(input)
+	userData := r.KCMS.UserController.ConvertEditUserInputToInputUser(input)
 
 	id, err := r.KCMS.UserController.EditUser(userData, authToken)
 
@@ -46,7 +47,7 @@ func (r *mutationResolver) EditUser(ctx context.Context, input model.EditUserInp
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (string, error) {
-	authToken := headers.GetHeaderAuth(ctx)
+	authToken := getHeaderAuth(ctx)
 
 	_, err := r.KCMS.UserController.DeleteUser(id, authToken)
 	if err != nil {
@@ -135,8 +136,6 @@ func (r *mutationResolver) Login(ctx context.Context, email *string, username *s
 }
 
 func (r *mutationResolver) Signup(ctx context.Context, user model.SignupUser) (string, error) {
-	// headers.GetHeaderAuth(ctx)
-
 	return "321", nil
 }
 

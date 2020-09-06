@@ -20,6 +20,8 @@ type UserController interface {
 	CanEditUser(userType UserType) bool
 	GetUserRequestToken()
 	IsEmailValid(email string) bool
+	ConvertAddUserInputToInputUser(input model.AddUserInput) InputUserData
+	ConvertEditUserInputToInputUser(input model.EditUserInput) InputUserData
 
 	LogUserIn(email *string, username *string, password string, secret string) (string, string)
 	GetUserByID(id string) User
@@ -57,7 +59,7 @@ type BaseUserController struct{}
 // ConvertAddUserInputToInputUser will convert the GraphQL AddUserInput model into an
 // InputUserData struct for easy insertion into the database. This function
 // checks for nil input and pre-fills with defaults.
-func ConvertAddUserInputToInputUser(input model.AddUserInput) InputUserData {
+func (inst BaseUserController) ConvertAddUserInputToInputUser(input model.AddUserInput) InputUserData {
 	userData := InputUserData{
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
@@ -99,7 +101,7 @@ func ConvertAddUserInputToInputUser(input model.AddUserInput) InputUserData {
 // ConvertEditUserInputToInputUser will convert the GraphQL EditUserInput model into
 // an InputUserData structu for easy insertion into the database. This function does not
 // check for nil input, because the user is allowed to not send all data.
-func ConvertEditUserInputToInputUser(input model.EditUserInput) InputUserData {
+func (inst BaseUserController) ConvertEditUserInputToInputUser(input model.EditUserInput) InputUserData {
 	return InputUserData{
 		ID:        &input.ID,
 		FirstName: input.FirstName,
