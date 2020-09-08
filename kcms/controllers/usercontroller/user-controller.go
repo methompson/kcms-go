@@ -115,9 +115,11 @@ func (inst BaseUserController) ConvertEditUserInputToInputUser(input model.EditU
 	}
 }
 
+var compareHash = bcrypt.CompareHashAndPassword
+
 // CheckPassword checks a user's password against the hashed version in storage
 func (inst BaseUserController) CheckPassword(user User, password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(user.password), []byte(password))
+	err := compareHash([]byte(user.password), []byte(password))
 
 	if err == nil {
 		return true
