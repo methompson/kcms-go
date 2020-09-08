@@ -105,6 +105,10 @@ func (inst MySQLUserController) GetUserByUsername(username string) User {
 // LogUserIn takes input values from a GraphQL request, gets a user and authenticates the password
 // returns a JWT for the user
 func (inst MySQLUserController) LogUserIn(email *string, username *string, password string, secret string) (string, string) {
+	if email == nil && username == nil {
+		return "", "User Does Not Exist"
+	}
+
 	var user User
 
 	// We get a user from
@@ -114,10 +118,6 @@ func (inst MySQLUserController) LogUserIn(email *string, username *string, passw
 
 	if username != nil {
 		user = inst.GetUserByUsername(*username)
-	}
-
-	if (user == User{}) {
-		return "", "User Does Not Exist"
 	}
 
 	validPass := inst.CheckPassword(user, password)
