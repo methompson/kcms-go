@@ -78,19 +78,15 @@ func JWTExtractor(kcms *kcms.KCMS) func(http.Handler) http.Handler {
 func GetHeaderAuth(ctx context.Context) *jwtuserdata.JWTUserData {
 	// Get the authToken from the headers
 	k := authContextKey("authToken")
-	token := ctx.Value(k)
+	contextValue := ctx.Value(k)
 
 	// We can't make a type assertion on nil, so we have to check if it's nil
-	var decodedToken *jwtuserdata.JWTUserData
-	// var decodedToken JWTUserData
+	var token *jwtuserdata.JWTUserData
 
 	// If the token isn't nil, we assert that it's a jwt.MapClaims type
-	if token != nil {
-		// I'm not certain we need to maintain a reference, so this will pass a copy
-		// decodedToken = *ctx.Value(k).(*JWTUserData)
-
-		decodedToken = ctx.Value(k).(*jwtuserdata.JWTUserData)
+	if contextValue != nil {
+		token = contextValue.(*jwtuserdata.JWTUserData)
 	}
 
-	return decodedToken
+	return token
 }

@@ -1,6 +1,7 @@
 package headers
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -61,8 +62,8 @@ func jwtShouldNotBeNil(t *testing.T) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func makeDummyJwt(exp int64, secret string) (string, error) {
-	claims := jwtuserdata.JWTUserData{
+func makeDummyClaims(exp int64) jwtuserdata.JWTUserData {
+	return jwtuserdata.JWTUserData{
 		ID:        "69",
 		FirstName: "firstName",
 		LastName:  "lastName",
@@ -74,6 +75,10 @@ func makeDummyJwt(exp int64, secret string) (string, error) {
 			ExpiresAt: exp,
 		},
 	}
+}
+
+func makeDummyJwt(exp int64, secret string) (string, error) {
+	claims := makeDummyClaims(exp)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret))
@@ -196,4 +201,29 @@ func TestExtractionDoesntHaveData(t *testing.T) {
 
 	handler := JWTExtractor(k)(nextHandler)
 	handler.ServeHTTP(httptest.NewRecorder(), request)
+}
+
+func TestGetHeaderAuthWillExtractJWT(t *testing.T) {
+	exp := time.Now().Unix() + 4*60*60
+	jwtClaims := makeDummyClaims(exp)
+
+	ctx := context.Background()
+	k := authContextKey("authToken")
+	ctx = context.WithValue(ctx, k, &jwtClaims)
+
+	token := GetHeaderAuth(ctx)
+
+	if token == nil {
+		t.Error("token should not be nil")
+	}
+}
+
+func TestGetHeaderAuthWillNotExtractNil(t *testing.T) {
+	ctx := context.Background()
+
+	token := GetHeaderAuth(ctx)
+
+	if token != nil {
+		t.Error("token should be nil")
+	}
 }
